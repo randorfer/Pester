@@ -69,15 +69,17 @@ function New-Fixture {
     #keep this formatted as is. the forma is output to the file as is, including indentation
     $scriptCode = "function $name {`r`n`r`n}"
 
-    $testCode = '$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
+    $testCode = @'
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace('.Tests.', '.')
 . "$here\$sut"
 
-Describe "#name#" {
-    It "does something useful" {
+Describe '#name#' {
+    It 'does something useful' {
         $true | Should Be $false
     }
-}' -replace "#name#",$name
+}
+'@ -replace '#name#',$name
 
     #endregion
 
@@ -87,7 +89,13 @@ Describe "#name#" {
     Create-File -Path $Path -Name "$Name.Tests.ps1" -Content $testCode
 }
 
-function Create-File ($Path,$Name,$Content) {
+function Create-File
+{
+    Param(
+        $Path,
+        $Name,
+        $Content
+    )
     if (-not (Test-Path -Path $Path)) {
         New-Item -ItemType Directory -Path $Path | Out-Null
     }
